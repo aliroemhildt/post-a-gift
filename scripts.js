@@ -1,26 +1,36 @@
-const recipientInput = document.querySelector('#recipient');
-const giftInput = document.querySelector('#name');
-const linkInput = document.querySelector('#link');
-const priceInput = document.querySelector('#price');
-const submitButton = document.querySelector('button');
-let nextIndex;
+let recipientInput = document.querySelector('#recipient');
+let giftInput = document.querySelector('#name');
+let linkInput = document.querySelector('#link');
+let priceInput = document.querySelector('#price');
+let submitButton = document.querySelector('button');
+let currentID;
 
 submitButton.addEventListener('click', postItem);
+window.addEventListener('load', getItems)
 
 function getItems() {
-  fetch('https://mysterious-mesa-00016.herokuapp.com/items')
+  return fetch('https://mysterious-mesa-00016.herokuapp.com/items')
     .then(response => response.json())
     .then(data => {
-      nextIndex = data.length;
+      currentID = data.length;
+      console.log('get / update next ID');
     })
 }
 
-async function postItem() {
-  const response = await getItems();
+function resetForm() {
+  recipientInput.value = '';
+  giftInput.value = '';
+  linkInput.value = '';
+  priceInput.value = '';
+  console.log('reset')
+}
+
+function postItem(e) {
+  e.preventDefault();
   fetch('https://mysterious-mesa-00016.herokuapp.com/items', {
     method: "POST",
     body: JSON.stringify({
-      id: nextIndex,
+      id: currentID + 1,
       recipient: recipientInput.value,
       name: giftInput.value,
       link: linkInput.value,
@@ -30,6 +40,9 @@ async function postItem() {
       'Content-Type': 'application/json'
     }
   })
+    .then(console.log('post'))
+    .then(getItems())
+    .then(resetForm())
     .catch(error => console.log(error))
 }
 
